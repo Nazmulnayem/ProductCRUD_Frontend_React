@@ -15,6 +15,7 @@ class EditProduct extends React.Component{
             description:'',
             price:'',
             image:null,
+            id:'',
         }
         this.handleChange = this.handleChange.bind(this)
         this.onImageChange = this.onImageChange.bind(this)
@@ -26,7 +27,8 @@ class EditProduct extends React.Component{
         const config = {
             headers:{
 
-                'Authorization' : 'bearer ' + localStorage.getItem('access_token')
+                'Authorization' : 'bearer ' + localStorage.getItem('access_token'),
+                'Context-type' : 'application/x-www-form-urlencoded'
 
             }
         };
@@ -39,7 +41,8 @@ class EditProduct extends React.Component{
 
                 this.setState({
 
-                    productAPI: data.data
+                    productAPI: data.data,
+                    id: data.data.id
 
 
                 })
@@ -55,9 +58,9 @@ class EditProduct extends React.Component{
     }
 
     handleChange = event =>{
-        const {name,defaultValue} = event.target
+        const {name,value} = event.target
         this.setState({
-            [name] : defaultValue,
+            [name] : value,
 
         })
 
@@ -66,36 +69,28 @@ class EditProduct extends React.Component{
 
         event.preventDefault();
         const data = new FormData;
+        data.append('id',this.state.id);
         data.append('title',this.state.title);
         data.append('description',this.state.description);
         data.append('price',this.state.price);
         data.append('image',this.state.image);
 
         const config = {
-
-        }
-
-        const id= window.location.pathname;
-        axios.put(`http://127.0.0.1:8000/api${id}`,{
-            title:this.state.title,
-            description:this.state.description,
-            price:this.state.price,
-        },{
             headers:{
                 'Authorization' : 'bearer ' + localStorage.getItem('access_token'),
-                'Content-Type' : 'application/x-www-form-urlencoded ',
-                'Accept' : 'application/json '
+
             }
-
-        })
+        }
+        axios.post(`http://127.0.0.1:8000/api/update-product`,data,config)
             .then(response =>{
-
-               console.log(response)
+                window.alert('product updates successfully')
+                window.location.reload()
             })
             .catch(response =>{
 
 
             })
+
 
 
     }
@@ -124,20 +119,22 @@ class EditProduct extends React.Component{
                                     <h3 className="text-center">Edit Product</h3>
 
                                     <div className="form-group">
-                                        <label>Product Title</label>
-                                        <input  type="text" name="title" className="form-control"
-                                               placeholder="Enter title" defaultValue={this.state.productAPI.Title} onChange={this.handleChange} required/>
+                                        <label>Product Title : {this.state.productAPI.Title}</label>
+                                        <input  type="text" name="title"   className="form-control"
+                                               placeholder="Enter title"  onChange={this.handleChange} required/>
 
                                     </div>
+
                                     <div className="form-group">
-                                        <label>Product Description</label>
-                                        <textarea type="text" name="description" placeholder="Enter Description" className="form-control" defaultValue={this.state.productAPI.Description} onChange={this.handleChange}></textarea>
+                                        <label>Product Description : </label>
+                                        <textarea type="text" name="description" placeholder="Enter Description"  className="form-control"  onChange={this.handleChange}></textarea>
 
                                     </div>
+
                                     <div className="form-group">
-                                        <label >Product Price</label>
-                                        <input defaultValue={this.state.productAPI.Price} type="number" name="price" className="form-control"
-                                               placeholder="Enter price" onChange={this.handleChange} required/>
+                                        <label >Product Price :  {this.state.productAPI.Price}</label>
+                                        <input  type="number" name="price"className="form-control"
+                                               placeholder="Enter price" onChange={this.handleChange}  required/>
                                     </div>
 
                                     <div className="form-group">
